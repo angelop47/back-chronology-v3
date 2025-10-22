@@ -12,12 +12,12 @@ export const getEvents = async (req: Request, res: Response) => {
 
   if (error) return res.status(500).json({ error: error.message });
 
-  res.json(data ?? []); // TypeScript sabe que data puede ser Event[]
+  res.json(data ?? []);
 };
 
 // Crear un evento
 export const createEvent = async (req: Request, res: Response) => {
-  const { title, date } = req.body;
+  const { title, date, description, createdAt, verified } = req.body;
   if (!title || !date) {
     return res.status(400).json({ message: 'Title and date are required' });
   }
@@ -26,6 +26,9 @@ export const createEvent = async (req: Request, res: Response) => {
     id: uuidv4(),
     title,
     date,
+    description,
+    createdAt: new Date().toISOString(),
+    verified: false,
   };
 
   const { data, error } = await supabase.from('events').insert([newEvent]).select('*'); // <--- esto asegura que se devuelvan los registros insertados
