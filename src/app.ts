@@ -1,13 +1,15 @@
-import express, { type Application, type Request, type Response } from 'express';
+import express from 'express';
 import cors from 'cors';
+import eventsRoutes from './routes/eventsRoutes';
+import dotenv from 'dotenv';
 
-const app: Application = express();
+dotenv.config();
+
+const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('Servidor funcionando correctamente');
-});
+app.use('/events', eventsRoutes);
 
 export default app;
