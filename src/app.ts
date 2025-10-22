@@ -3,11 +3,11 @@ import cors from 'cors';
 
 const app: Application = express();
 
-app.use(cors()); 
+app.use(cors());
 app.use(express.json());
 
 app.get('/', (req: Request, res: Response) => {
-    res.send('Servidor funcionando correctamente');
+  res.send('Servidor funcionando correctamente');
 });
 
 export default app;
