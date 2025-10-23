@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { Event } from '../models/event';
 import { supabase } from '../config/supabase';
-import { v4 as uuidv4 } from 'uuid';
+import { getUUID } from '../plugins/get-id.plugin';
 
 // Obtener todos los eventos
 export const getEvents = async (req: Request, res: Response) => {
@@ -23,7 +23,7 @@ export const createEvent = async (req: Request, res: Response) => {
   }
 
   const newEvent: Event = {
-    id: uuidv4(),
+    id: getUUID(),
     title,
     date,
     description,
