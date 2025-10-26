@@ -5,4 +5,5 @@ export interface Event {
   description: string;
   createdAt: string; // ISO date string
   verified: boolean;
+  imageUrl?: string[];
 }
