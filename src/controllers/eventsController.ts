@@ -25,9 +25,14 @@ export const createEvent = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Title and date are required' });
     }
     let imageUrls: string[] = [];
-    if (req.file) {
-      const url = await uploadToSupabase(req.file.path, req.file.originalname, req.file.mimetype);
-      imageUrls.push(url);
+
+    //Manejo de múltiples archivos
+    const files = req.files as Express.Multer.File[] | undefined;
+    if (files && files.length > 0) {
+      for (const file of files) {
+        const url = await uploadToSupabase(file.path, file.originalname, file.mimetype);
+        imageUrls.push(url);
+      }
     }
 
     const newEvent: Event = {

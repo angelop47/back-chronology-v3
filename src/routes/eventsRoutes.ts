@@ -10,6 +10,6 @@ const router = express.Router();
 router.get('/', getEvents);
 
 // Crear evento con imagen
-router.post('/', upload.single('file'), createEvent);
+router.post('/', upload.array('files'), createEvent);
 
 export default router;
