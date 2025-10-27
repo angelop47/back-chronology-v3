@@ -4,10 +4,10 @@ import { supabase } from '../config/supabase';
 import { getUUID } from '../plugins/get-id.plugin';
 import { uploadToSupabase } from '../services/uploadService';
 
-// Obtener todos los eventos
+// Obtiene todos los eventos ordenados por fecha, incluyendo sus categorías relacionadas
 export const getEvents = async (req: Request, res: Response) => {
   const { data, error } = await supabase
-    .from('events') // solo el nombre de la tabla como string
+    .from('events')
     .select(
       `
       *,
@@ -48,7 +48,7 @@ export const createEvent = async (req: Request, res: Response) => {
       }
     }
 
-    //Manejo de múltiples archivos
+    // Procesa y sube las imágenes adjuntas al evento a Supabase
     const files = req.files as Express.Multer.File[] | undefined;
     if (files && files.length > 0) {
       for (const file of files) {

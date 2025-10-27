@@ -11,8 +11,9 @@ export const getCategories = async (req: Request, res: Response) => {
   res.json(data ?? []);
 };
 
-// Crear una nueva categoría
+// Crea una nueva categoría y la almacena en la base de datos
 export const createCategory = async (req: Request, res: Response) => {
+  // Valida que los campos requeridos estén presentes
   const { name, description } = req.body || {};
   if (!name || !description) {
     return res.status(400).json({ message: 'Name and description are required' });
