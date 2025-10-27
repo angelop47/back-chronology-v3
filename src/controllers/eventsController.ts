@@ -39,7 +39,7 @@ export const createEvent = async (req: Request, res: Response) => {
 
     let { categories } = req.body;
 
-    // ✅ Parsear categorías si vienen como string (por ejemplo en form-data)
+    // Parsear categorías si vienen como string
     if (typeof categories === 'string') {
       try {
         categories = JSON.parse(categories);
