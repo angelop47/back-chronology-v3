@@ -8,12 +8,23 @@ import { uploadToSupabase } from '../services/uploadService';
 export const getEvents = async (req: Request, res: Response) => {
   const { data, error } = await supabase
     .from('events') // solo el nombre de la tabla como string
-    .select('*')
+    .select(
+      `
+      *,
+      event_categories (
+      category_id:categories (*)
+    )`,
+    )
     .order('date', { ascending: true });
 
   if (error) return res.status(500).json({ error: error.message });
 
-  res.json(data ?? []);
+  const formatted = data.map((event) => ({
+    ...event,
+    categories: event.event_categories.map((ec: any) => ec.category),
+  }));
+
+  res.json(formatted);
 };
 
 // Crear un evento
@@ -25,6 +36,17 @@ export const createEvent = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Title and date are required' });
     }
     let imageUrls: string[] = [];
+
+    let { categories } = req.body;
+
+    // ✅ Parsear categorías si vienen como string (por ejemplo en form-data)
+    if (typeof categories === 'string') {
+      try {
+        categories = JSON.parse(categories);
+      } catch {
+        categories = [];
+      }
+    }
 
     //Manejo de múltiples archivos
     const files = req.files as Express.Multer.File[] | undefined;
@@ -45,11 +67,30 @@ export const createEvent = async (req: Request, res: Response) => {
       imageUrl: imageUrls,
     };
 
-    const { data, error } = await supabase.from('events').insert([newEvent]).select('*');
+    const { data: insertedEvents, error: insertError } = await supabase
+      .from('events')
+      .insert([newEvent])
+      .select('id');
 
-    if (error) return res.status(500).json({ error: error.message });
+    if (insertError) throw insertError;
 
-    res.status(201).json(data ? data[0] : null);
+    const eventId = insertedEvents?.[0]?.id;
+
+    // Insertar categorías en la tabla intermedia
+    if (categories && Array.isArray(categories) && eventId) {
+      const eventCategories = categories.map((catId: string) => ({
+        event_id: eventId,
+        category_id: catId,
+      }));
+
+      const { error: relationError } = await supabase
+        .from('event_categories')
+        .insert(eventCategories);
+
+      if (relationError) throw relationError;
+    }
+
+    res.status(201).json({ message: 'Evento creado con éxito', id: eventId });
   } catch (err) {
     console.error('Error creating event:', err);
     res.status(500).json({ error: String(err) });

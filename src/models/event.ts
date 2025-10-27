@@ -6,4 +6,5 @@ export interface Event {
   createdAt: string; // ISO date string
   verified: boolean;
   imageUrl?: string[];
+  categories?: string[]; // Array de nombres de categorías
 }
