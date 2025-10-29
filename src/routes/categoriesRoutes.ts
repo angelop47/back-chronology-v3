@@ -1,5 +1,5 @@
 import express from 'express';
-import { getCategories, createCategory } from '../controllers/Category/index';
+import { getCategories, createCategory, deleteCategory } from '../controllers/Category/index';
 
 const router = express.Router();
 
@@ -8,5 +8,8 @@ router.get('/', getCategories);
 
 // Crear nueva categoria
 router.post('/', createCategory);
+
+// Eliminar Categoria
+router.delete('/:id', deleteCategory);
 
 export default router;
