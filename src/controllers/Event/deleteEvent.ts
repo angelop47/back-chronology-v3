@@ -1,3 +1,4 @@
+// src/controllers/Event/deleteEvent.ts
 import { Request, Response } from 'express';
 import { supabase } from '../../config/supabase';
 

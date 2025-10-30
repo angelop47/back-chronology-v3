@@ -1,3 +1,4 @@
+// src/controllers/Category/createCategory.ts
 import { Request, Response } from 'express';
 import { Category } from '../../models/category';
 import { supabase } from '../../config/supabase';

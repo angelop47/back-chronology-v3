@@ -1,3 +1,4 @@
+// src/controllers/Category/getCategories.ts
 import { Request, Response } from 'express';
 import { supabase } from '../../config/supabase';
 

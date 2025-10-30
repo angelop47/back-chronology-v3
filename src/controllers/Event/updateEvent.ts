@@ -1,3 +1,4 @@
+// src/controllers/Event/updateEvent.ts
 import { Request, Response } from 'express';
 import { supabase } from '../../config/supabase';
 import { uploadToSupabase } from '../../services/uploadService';

@@ -1,3 +1,4 @@
+// src/routes/eventsRoutes.ts
 import express from 'express';
 import { getEvents, createEvent, updateEvent, deleteEvent } from '../controllers/Event/index';
 import multer from 'multer';

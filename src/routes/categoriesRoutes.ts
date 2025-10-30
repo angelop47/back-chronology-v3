@@ -1,3 +1,4 @@
+// src/routes/categoriesRoutes.ts
 import express from 'express';
 import { getCategories, createCategory, deleteCategory } from '../controllers/Category/index';
 
