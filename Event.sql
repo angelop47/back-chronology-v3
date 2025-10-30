@@ -4,7 +4,7 @@ create table if not exists public.events (
   title text NOT NULL,
   date date NOT NULL,
   description text,
-  created_at timestamptz DEFAULT now(),
+  createdAt timestamptz DEFAULT now(),
   verified boolean DEFAULT false,
   image_url text[]
 );
@@ -14,7 +14,7 @@ CREATE TABLE categories (
   id uuid PRIMARY KEY,
   name text NOT NULL,
   description text,
-  created_at timestamptz DEFAULT now()
+  createdAt timestamptz DEFAULT now()
 );
 
 -- Tabla intermedia (relación muchos a muchos)

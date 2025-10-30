@@ -16,7 +16,7 @@ export const createCategory = async (req: Request, res: Response) => {
     id: getUUID(),
     name,
     description,
-    created_at: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   };
 
   const { data, error } = await supabase.from('categories').insert([newCategory]).select('*'); // <--- esto asegura que se devuelvan los registros insertados
