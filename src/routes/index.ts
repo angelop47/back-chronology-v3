@@ -5,10 +5,10 @@ import categoriesRoutes from './categoriesRoutes';
 
 export const registerRoutes = (app: Express): void => {
   // Events routes
-  app.use('/events', eventsRoutes);
+  app.use('/api/events', eventsRoutes);
 
   // Categories routes
-  app.use('/categories', categoriesRoutes);
+  app.use('/api/categories', categoriesRoutes);
 };
 
 export { default as eventsRoutes } from './eventsRoutes';
