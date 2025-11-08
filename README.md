@@ -9,8 +9,9 @@ Esta guía documenta cómo instalar, ejecutar y consumir la API de Chronology V3
 - Node.js 18+
 - npm 8+
 - Cuenta y proyecto en Supabase con:
-  - Base de datos con tablas `events`, `categories` y tabla intermedia `event_categories`
+  - Base de datos con tablas `events`, `categories`, `clerk_users` y tabla intermedia `event_categories`
   - Bucket de Storage llamado `uploads` (público o con política que permita `getPublicUrl`)
+- Cuenta en Clerk para autenticación de usuarios
 
 ---
 
@@ -27,19 +28,101 @@ npm install
 Crea un archivo `.env` en la raíz del proyecto con:
 
 ```ini
+# Server
 PORT=4000
-NODE_ENV=DEVELOPMENT
+NODE_ENV=development
+
+# Supabase
 SUPABASE_URL=tu_url_de_supabase
 SUPABASE_SERVICE_KEY=tu_service_role_key
+SUPABASE_ANON_KEY=tu_anon_key
+
+# Clerk
+CLERK_WEBHOOK_SECRET=tu_webhook_secret_de_clerk
 ```
 
-- `PORT`: puerto HTTP del servidor.
-- `SUPABASE_URL`: URL del proyecto Supabase.
-- `SUPABASE_SERVICE_KEY`: Service Role Key (necesaria para escribir en BD/Storage desde el backend).
+### Explicación de variables:
+
+#### Servidor
+- `PORT`: Puerto HTTP del servidor (por defecto 4000).
+- `NODE_ENV`: Entorno de ejecución (`development` o `production`).
+
+#### Supabase
+- `SUPABASE_URL`: URL de tu proyecto Supabase.
+- `SUPABASE_SERVICE_KEY`: Service Role Key (necesaria para operaciones de escritura).
+- `SUPABASE_ANON_KEY`: Clave anónima de Supabase.
+
+#### Clerk
+- `CLERK_WEBHOOK_SECRET`: Secreto para verificar webhooks de Clerk (obtener desde el dashboard de Clerk).
 
 ---
 
-## 4) Ejecución
+## 4) Configuración de Clerk Webhook
+
+### Crear tabla en Supabase
+
+Ejecuta el siguiente SQL en el editor de SQL de Supabase para crear la tabla `clerk_users`:
+
+```sql
+create extension if not exists "uuid-ossp";
+
+create table public.clerk_users (
+  id uuid primary key default uuid_generate_v4(),
+  clerk_id text unique not null,                  -- ID del usuario en Clerk (user_xxx)
+  email text,                                     -- correo principal
+  first_name text,
+  last_name text,
+  image_url text,
+  last_event text,                                -- último evento recibido (user.created, etc)
+  updated_at timestamptz default now()            -- fecha del último sync
+);
+```
+
+### Configurar Webhook en Clerk
+
+1. Ve al [Dashboard de Clerk](https://dashboard.clerk.com/)
+2. Selecciona tu aplicación
+3. Ve a "Webhooks" en la barra lateral
+4. Haz clic en "+ Add Endpoint"
+5. Configura el webhook:
+   - **Endpoint URL**: `https://tudominio.com/api/clerk/webhooks` (o tu URL de desarrollo con ngrok)
+   - **Subscribed events**:
+     - `user.created`
+     - `user.updated`
+     - `user.deleted`
+     - `user.signed_in`
+     - `user.signed_out`
+6. Copia el "Webhook Signing Secret" y guárdalo en tu `.env` como `CLERK_WEBHOOK_SECRET`
+
+## 5) Endpoints de Webhook
+
+### `POST /api/clerk/webhooks`
+
+Endpoint para recibir webhooks de Clerk y sincronizar usuarios con la base de datos.
+
+#### Eventos soportados:
+- `user.created`: Crea un nuevo usuario en la tabla `clerk_users`
+- `user.updated`: Actualiza la información del usuario existente
+- `user.deleted`: Elimina al usuario de la base de datos
+- `user.signed_in`: Actualiza el último evento del usuario
+- `user.signed_out`: Actualiza el último evento del usuario
+
+#### Ejemplo de respuesta exitosa:
+```json
+{
+  "success": true
+}
+```
+
+#### Ejemplo de error:
+```json
+{
+  "error": "Error message",
+  "details": "Additional error details"
+}
+```
+
+## 6) Ejecución
 
 - Desarrollo (con recarga en caliente):
 
