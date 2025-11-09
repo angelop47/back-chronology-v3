@@ -8,4 +8,5 @@ export interface Event {
   verified: boolean;
   imageUrl?: string[];
   categories?: string[]; // Array de IDs de categorías
+  createdBy: string; // ID del usuario que creó el evento
 }

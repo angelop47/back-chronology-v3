@@ -9,10 +9,11 @@ import { uploadToSupabase } from '../../services/uploadService';
 export const createEvent = async (req: Request, res: Response) => {
   try {
     // ✅ Evita el error si req.body es undefined
-    const { title, date, description } = req.body || {};
+    const { title, date, description, createdBy } = req.body || {};
     if (!title || !date) {
       return res.status(400).json({ message: 'Title and date are required' });
     }
+    if (!createdBy) return res.status(400).json({ message: 'Missing createdBy (Clerk ID)' });
     let imageUrls: string[] = [];
 
     let { categories } = req.body;
@@ -35,6 +36,7 @@ export const createEvent = async (req: Request, res: Response) => {
       }
     }
 
+    // Crear el objeto del evento
     const newEvent: Event = {
       id: getUUID(),
       title,
@@ -43,8 +45,10 @@ export const createEvent = async (req: Request, res: Response) => {
       createdAt: new Date().toISOString(),
       verified: false,
       imageUrl: imageUrls,
+      createdBy, // <- Clerk ID (user_xxx)
     };
 
+    // Insertar evento en la base de datos
     const { data: insertedEvents, error: insertError } = await supabase
       .from('events')
       .insert([newEvent])
@@ -54,7 +58,7 @@ export const createEvent = async (req: Request, res: Response) => {
 
     const eventId = insertedEvents?.[0]?.id;
 
-    // Insertar categorías en la tabla intermedia
+    // Si existen categorías, insertar relaciones
     if (categories && Array.isArray(categories) && eventId) {
       const eventCategories = categories.map((catId: string) => ({
         event_id: eventId,
@@ -68,6 +72,7 @@ export const createEvent = async (req: Request, res: Response) => {
       if (relationError) throw relationError;
     }
 
+    // Respuesta final
     res.status(201).json({ message: 'Evento creado con éxito', id: eventId });
   } catch (err) {
     console.error('Error creating event:', err);
