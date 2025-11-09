@@ -18,7 +18,7 @@ app.use(requestLogger);
 registerRoutes(app);
 
 // Clerk webhooks endpoint
-import { registerWebhookRoute } from './routes/clerkWebhooks';
+import { registerWebhookRoute } from './routes/clerkWebhooksRoute';
 registerWebhookRoute(app);
 
 // Error handler must be last
