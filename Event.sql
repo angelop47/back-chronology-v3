@@ -17,14 +17,6 @@ CREATE TABLE categories (
   createdAt timestamptz DEFAULT now()
 );
 
--- Tabla intermedia (relación muchos a muchos)
-CREATE TABLE event_categories (
-  event_id uuid REFERENCES events(id) ON DELETE CASCADE,
-  category_id uuid REFERENCES categories(id) ON DELETE CASCADE,
-  PRIMARY KEY (event_id, category_id)
-);
-
-
 
 create extension if not exists "uuid-ossp";
 
