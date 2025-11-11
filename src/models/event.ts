@@ -1,4 +1,3 @@
-// src/models/event.ts
 export interface Event {
   id: string;
   title: string;
@@ -7,6 +6,6 @@ export interface Event {
   createdAt: string; // ISO date string
   verified: boolean;
   imageUrl?: string[];
-  categories?: string[]; // Array de IDs de categorías
+  category?: string;
   createdBy: string; // ID del usuario que creó el evento
 }
